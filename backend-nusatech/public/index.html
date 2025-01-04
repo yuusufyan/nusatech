@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Chat App</h1>
+    <input id="username" placeholder="Enter your name" />
+    <button id="register">Register</button>
+    <input id="message" placeholder="Enter your message" />
+    <button id="send">Send</button>
+    <ul id="messages"></ul>
+
+    <script>
+        const socket = io('http://localhost:3001'); // Sesuaikan URL jika perlu
+        let username;
+
+        document.getElementById('register').onclick = () => {
+            username = document.getElementById('username').value;
+            socket.emit('register', username);
+        };
+
+        socket.on('registered', (name) => {
+            console.log(`Registered as ${name}`);
+        });
+
+        document.getElementById('send').onclick = () => {
+            const message = document.getElementById('message').value;
+            socket.emit('message', { content: message });
+            document.getElementById('message').value = '';
+        };
+
+        socket.on('message', (data) => {
+            const li = document.createElement('li');
+            li.textContent = `${data.sender}: ${data.content}`;
+            document.getElementById('messages').appendChild(li);
+        });
+    </script>
+</body>
+</html>
